@@ -1,73 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Table.css";
 import logo from "./images/111111.png";
-import image1 from "./images/image1.png";
-import image2 from "./images/image2.png";
-import image3 from "./images/image3.png";
-import image4 from "./images/image4.png";
+import Papa from "papaparse";
 
 const Table = () => {
-  // this is dummyData
-  const dummyData = [
-    {
-      id: 1,
-      NAME: "Manas Kulkarni",
-      COURSES: 4,
-      SKILL: 4,
-      GEN_AI: 1,
-      DUE_DATE: "18/10/23",
-      STATUS: "not completed",
-    },
-    {
-      id: 2,
-      NAME: "Sandesh Jadhav",
-      COURSES: 4,
-      SKILL: 4,
-      GEN_AI: 1,
-      DUE_DATE: "18/10/23",
-      STATUS: "completed ",
-    },
-    {
-      id: 3,
-      NAME: "Viraj Sharma",
-      COURSES: 4,
-      SKILL: 4,
-      GEN_AI: 1,
-      DUE_DATE: "18/10/23",
-      STATUS: "completed",
-    },
-    {
-      id: 4,
-      NAME: "Rohit Koli",
-      COURSES: 4,
-      SKILL: 4,
-      GEN_AI: 1,
-      DUE_DATE: "18/10/23",
-      STATUS: "not completed",
-    },
-    {
-      id: 5,
-      NAME: "Akkash Chopra",
-      COURSES: 4,
-      SKILL: 4,
-      GEN_AI: 1,
-      DUE_DATE: "18/10/23",
-      STATUS: "not completed",
-    },
-    {
-      id: 6,
-      NAME: "Rohan Prajapati",
-      COURSES: 4,
-      SKILL: 4,
-      GEN_AI: 1,
-      DUE_DATE: "18/10/23",
-      STATUS: "completed",
-    },
-  ];
+  // const [csvData, setCsvData] = useState([]);
 
   const [value, setValue] = useState("");
-  const [dataSource, setDataSource] = useState(dummyData);
+  const [dataSource, setDataSource] = useState([]);
   const [tableFilter, setTableFilter] = useState([]);
+
+  useEffect(() => {
+    const loadCSVData = async () => {
+      const csvFilePath = process.env.PUBLIC_URL + "/csv/test.csv"; // Path to your CSV file in the public folder
+
+      Papa.parse(csvFilePath, {
+        download: true,
+        header: true, // Assuming the first row contains headers
+        dynamicTyping: true,
+        complete: (result) => {
+          const csvDataWithIds = result.data.map((row, index) => {
+            // Generate auto ID starting from 1
+            const id = index + 1;
+
+            // Replace spaces and special characters in header keys with underscores
+            const formattedRow = {};
+            for (const key in row) {
+              const formattedKey = key
+                .replace(/ /g, "_")
+                .replace(/#/g, "")
+                .replace(/&/g, "_and_")
+                .toLowerCase();
+              formattedRow[formattedKey] = row[key];
+            }
+
+            return { id, ...formattedRow };
+          });
+
+          setDataSource(csvDataWithIds);
+        },
+        error: (error) => {
+          console.error("Error parsing CSV:", error.message);
+        },
+      });
+    };
+
+    loadCSVData();
+  }, []);
+
   const filterData = (e) => {
     if (e.target.value !== "") {
       setValue(e.target.value);
@@ -83,9 +63,19 @@ const Table = () => {
     }
   };
 
+  if (!dataSource || dataSource.length === 0) {
+    return (
+      <div className="table__body">
+        <p>No data available</p>
+      </div>
+    );
+  }
+
+  console.log(dataSource);
+
   return (
     <div className="table__body">
-      <div className="tableinfo d-flex justify-content-center align-items-center flex-column">
+      <div className="tableinfo">
         <div className="table-upper w-100 mb-5">
           <div className="Texthead d-flex w-100 justify-content-center align-items-center flex-column">
             <a href="https://gdsc.community.dev/datta-meghe-college-of-engineering-navi-mumbai/">
@@ -118,64 +108,57 @@ const Table = () => {
             <p className="table-heading content-course m-0">COURSES</p>
             <p className="table-heading content-skill m-0">SKILL</p>
             <p className="table-heading content-genai m-0">GEN AI</p>
-            <p className="table-heading content-status m-0">STATUS</p>
+            <p className="table-heading content-status m-0">
+              REDEMPTION STATUS
+            </p>
           </div>
+
           {value.length > 0
             ? tableFilter.map((data) => (
                 <div
-                  className={`table-contents d-flex justify-content-evenly align-items-center flex-row  ${
-                    data.STATUS === "completed" ? "completed-bg" : ""
-                  }`}
+                  className={`table-contents d-flex justify-content-evenly align-items-center flex-row 
+                   ${
+                     data.enrolment_status === "completed" ? "completed-bg" : ""
+                   }`}
                   key={data.id}
                 >
-                  <p className="table-content content-id m-0">{data.id}</p>
-                  <p className="table-content content-name m-0">{data.NAME}</p>
-                  <p className="table-content content-course m-0">
-                    {data.COURSES}
-                  </p>
-                  <p className="table-content content-skill m-0">
-                    {data.SKILL}
-                  </p>
-                  <p className="table-content content-genai m-0">
-                    {data.GEN_AI}
-                  </p>
-                  <p
-                    className={`table-content content-status m-0 ${
-                      data.STATUS === "completed"
-                        ? "text-success"
-                        : "text-danger"
-                    }`}
-                  >
-                    {data.STATUS}
-                  </p>
+                  {Object.keys(data).map((key) => (
+                    <p className={`table-content content-${key} m-0`} key={key}>
+                      {data[key]}
+                    </p>
+                  ))}
                 </div>
               ))
             : dataSource.map((data) => (
                 <div
                   className={`table-contents d-flex justify-content-evenly align-items-center flex-row ${
-                    data.STATUS === "completed" ? "completed-bg" : ""
+                    data.total_completions_of_both_pathways === "YES"
+                      ? "completed-bg"
+                      : ""
                   }`}
                   key={data.id}
                 >
                   <p className="table-content content-id m-0">{data.id}</p>
-                  <p className="table-content content-name m-0">{data.NAME}</p>
+                  <p className="table-content content-name m-0">
+                    {data.student_name}
+                  </p>
                   <p className="table-content content-course m-0">
-                    {data.COURSES}
+                    {data._of_courses_completed}
                   </p>
                   <p className="table-content content-skill m-0">
-                    {data.SKILL}
+                    {data._of_skill_badges_completed}
                   </p>
                   <p className="table-content content-genai m-0">
-                    {data.GEN_AI}
+                    {data._of_genai_game_completed}
                   </p>
                   <p
                     className={`table-content content-status m-0 ${
-                      data.STATUS === "completed"
+                      data.total_completions_of_both_pathways === "YES"
                         ? "text-success"
                         : "text-danger"
                     }`}
                   >
-                    {data.STATUS}
+                    {data.total_completions_of_both_pathways}
                   </p>
                 </div>
               ))}
