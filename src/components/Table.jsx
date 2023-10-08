@@ -114,54 +114,76 @@ const Table = () => {
           </div>
 
           {value.length > 0
-            ? tableFilter.map((data) => (
-                <div
-                  className={`table-contents d-flex justify-content-evenly align-items-center flex-row 
-                   ${
-                     data.enrolment_status === "completed" ? "completed-bg" : ""
-                   }`}
-                  key={data.id}
-                >
-                  {Object.keys(data).map((key) => (
-                    <p className={`table-content content-${key} m-0`} key={key}>
-                      {data[key]}
-                    </p>
-                  ))}
-                </div>
-              ))
-            : dataSource.map((data) => (
-                <div
-                  className={`table-contents d-flex justify-content-evenly align-items-center flex-row ${
-                    data.total_completions_of_both_pathways === "YES"
-                      ? "completed-bg"
-                      : ""
-                  }`}
-                  key={data.id}
-                >
-                  <p className="table-content content-id m-0">{data.id}</p>
-                  <p className="table-content content-name m-0">
-                    {data.student_name}
-                  </p>
-                  <p className="table-content content-course m-0">
-                    {data._of_courses_completed}
-                  </p>
-                  <p className="table-content content-skill m-0">
-                    {data._of_skill_badges_completed}
-                  </p>
-                  <p className="table-content content-genai m-0">
-                    {data._of_genai_game_completed}
-                  </p>
-                  <p
-                    className={`table-content content-status m-0 ${
-                      data.total_completions_of_both_pathways === "YES"
-                        ? "text-success"
-                        : "text-danger"
+            ? tableFilter
+                .filter((data) => data.id !== 150)
+                .map((data) => (
+                  <div
+                    className={`table-contents d-flex justify-content-evenly align-items-center flex-row ${
+                      data.total_completions_of_both_pathways === "Yes"
+                        ? "completed-bg"
+                        : ""
                     }`}
+                    key={data.id}
                   >
-                    {data.total_completions_of_both_pathways}
-                  </p>
-                </div>
-              ))}
+                    <p className="table-content content-id m-0">{data.id}</p>
+                    <p className="table-content content-name m-0">
+                      {data.student_name}
+                    </p>
+                    <p className="table-content content-course m-0">
+                      {data._of_courses_completed}
+                    </p>
+                    <p className="table-content content-skill m-0">
+                      {data._of_skill_badges_completed}
+                    </p>
+                    <p className="table-content content-genai m-0">
+                      {data._of_genai_game_completed}
+                    </p>
+                    <p
+                      className={`table-content content-status m-0 ${
+                        data.redemption_status === "Yes"
+                          ? "text-success"
+                          : "text-danger"
+                      }`}
+                    >
+                      {data.redemption_status}
+                    </p>
+                  </div>
+                ))
+            : dataSource
+                .filter((data) => data.id !== 150)
+                .map((data) => (
+                  <div
+                    className={`table-contents d-flex justify-content-evenly align-items-center flex-row ${
+                      data.total_completions_of_both_pathways === "Yes"
+                        ? "completed-bg"
+                        : ""
+                    }`}
+                    key={data.id}
+                  >
+                    <p className="table-content content-id m-0">{data.id}</p>
+                    <p className="table-content content-name m-0">
+                      {data.student_name}
+                    </p>
+                    <p className="table-content content-course m-0">
+                      {data._of_courses_completed}
+                    </p>
+                    <p className="table-content content-skill m-0">
+                      {data._of_skill_badges_completed}
+                    </p>
+                    <p className="table-content content-genai m-0">
+                      {data._of_genai_game_completed}
+                    </p>
+                    <p
+                      className={`table-content content-status m-0 ${
+                        data.redemption_status === "Yes"
+                          ? "text-success"
+                          : "text-danger"
+                      }`}
+                    >
+                      {data.redemption_status}
+                    </p>
+                  </div>
+                ))}
         </div>
       </div>
     </div>
